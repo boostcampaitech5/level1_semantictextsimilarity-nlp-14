@@ -1,0 +1,15 @@
+model_name: snunlp/KR-ELECTRA-discriminator
+batch_size: 16
+max_epoch: 10
+shuffle: true
+learning_rate: 1e-5
+train_path:   ../data/train.csv
+dev_path:    ../data/dev.csv
+test_path:    ../data/test.csv
+predict_path: ../data/test.csv
+weight_decay: 0.01
+warm_up_ratio: 0.0
+loss_func: MSE
+run_name: refactoring_01
+project_name: testing_for_refactoring
+entity: None
