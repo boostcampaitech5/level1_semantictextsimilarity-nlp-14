@@ -14,6 +14,8 @@ from pytorch_lightning.callbacks import LearningRateMonitor, EarlyStopping, Mode
 from itertools import chain
 from seed import *  # seed setting module
 
+## config
+import config
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, inputs, targets=[]):
@@ -253,25 +255,30 @@ if __name__ == '__main__':
     # 하이퍼 파라미터 등 각종 설정값을 입력받습니다
     # 터미널 실행 예시 : python3 run.py --batch_size=64 ...
     # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--model_name', default="snunlp/KR-ELECTRA-discriminator", type=str)
-    parser.add_argument('--batch_size', default=16, type=int)
-    parser.add_argument('--max_epoch', default=10, type=int)
-    parser.add_argument('--shuffle', default=True)
-    parser.add_argument('--learning_rate', default=2e-5, type=float)
-    parser.add_argument(
-        '--train_path', default='~/data/train_sentence_swap.csv')
-    parser.add_argument('--dev_path', default='~/data/dev.csv')
-    parser.add_argument('--test_path', default='~/data/dev.csv')
-    parser.add_argument('--predict_path', default='~/data/test.csv')
-    parser.add_argument('--weight_decay', default=0.01)
-    parser.add_argument('--warm_up_ratio', default=0.3)
-    parser.add_argument('--loss_func', default="MSE")
-    parser.add_argument('--run_name', default="001")
-    parser.add_argument('--project_name', default="STS_snunlp_9250")
-    parser.add_argument('--entity', default=None)   # wandb team name
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument(
+    #     '--model_name', default="snunlp/KR-ELECTRA-discriminator", type=str)
+    # parser.add_argument('--batch_size', default=16, type=int)
+    # parser.add_argument('--max_epoch', default=10, type=int)
+    # parser.add_argument('--shuffle', default=True)
+    # parser.add_argument('--learning_rate', default=2e-5, type=float)
+    # parser.add_argument(
+    #     '--train_path', default='~/data/train_sentence_swap.csv')
+    # parser.add_argument('--dev_path', default='~/data/dev.csv')
+    # parser.add_argument('--test_path', default='~/data/dev.csv')
+    # parser.add_argument('--predict_path', default='~/data/test.csv')
+    # parser.add_argument('--weight_decay', default=0.01)
+    # parser.add_argument('--warm_up_ratio', default=0.3)
+    # parser.add_argument('--loss_func', default="MSE")
+    # parser.add_argument('--run_name', default="001")
+    # parser.add_argument('--project_name', default="STS_snunlp_9250")
+    # parser.add_argument('--entity', default=None)   # wandb team name
+    # args = parser.parse_args()
+
+    # refactoring
+    args = config.config
+    print(args.project_name)
+    print(f"{args.loss_func}_{args.learning_rate}_{args.batch_size}_{args.weight_decay}_{args.max_epoch}_steplr_seed:{'_'.join(map(str,seed))}")
 
     # actual model train
     # wandb logger
@@ -306,7 +313,7 @@ if __name__ == '__main__':
     # gpu가 없으면 accelerator='cpu', 있으면 accelerator='gpu'
     trainer = pl.Trainer(
         precision="16-mixed",                   # 16-bit mixed precision
-        accelerator='gpu',                      # GPU 사용
+        accelerator='cpu',                      # GPU 사용
         # dataloader를 매 epoch마다 reload해서 resampling
         reload_dataloaders_every_n_epochs=1,
         max_epochs=args.max_epoch,            # 최대 epoch 수
@@ -338,7 +345,7 @@ if __name__ == '__main__':
     # tuner.scale_batch_size(model=model, datamodule=dataloader, mode="binsearch")
 
     # Train part
-    trainer.fit(model=model, datamodule=dataloader)
+    # trainer.fit(model=model, datamodule=dataloader)
     trainer.test(model=model, datamodule=dataloader)
 
     # # 학습이 완료된 모델을 저장합니다.
